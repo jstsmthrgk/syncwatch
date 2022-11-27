@@ -18,10 +18,19 @@ let syncTab = null;
 let share = null;
 let connectionUrl = 'https://syncevent.herokuapp.com';
 
+const connectionUrlFallback = 'http://84.201.135.146';
+let countReconnectAttempts = 0;
+const socketIOconfig = {
+  reconnection: true,
+  reconnectionDelayMax: 3000,
+  reconnectionDelay: 3000,
+  reconnectionAttempts: 3,
+};
+
 function initConnectionUrl() {
   chrome.storage.sync.get('connectionUrl', (obj) => {
     if (obj.connectionUrl === undefined) {
-      chrome.storage.sync.set({ connectionUrl: 'https://syncevent.herokuapp.com' });
+      chrome.storage.sync.set({ connectionUrl });
     } else {
       connectionUrl = obj.connectionUrl;
     }
@@ -222,9 +231,21 @@ function initSocketEvents() {
   for (let i = 0; i < socketEvents.length; i++) {
     const event = socketEvents[i];
     socket.on(event, () => {
+      console.log('socketio_event', event);
       sendStatusToPopup(event);
     });
   }
+
+  socket.on('connect_error', () => {
+    countReconnectAttempts++;
+    if (socketIOconfig.reconnectionAttempts + 1 === countReconnectAttempts && connectionUrl === 'https://syncevent.herokuapp.com') {
+      connectionUrl = connectionUrlFallback;
+      socket.io.uri = connectionUrlFallback;
+      chrome.storage.sync.set({ connectionUrl });
+      socket.disconnect().connect();
+      countReconnectAttempts = 0;
+    }
+  });
 
   socket.on('connect', () => {
     socket.emit('join', user);
@@ -237,12 +258,7 @@ function initSocketEvents() {
 }
 
 function initSockets() {
-  socket = io(connectionUrl, {
-    reconnection: true,
-    reconnectionDelayMax: 10000,
-    reconnectionDelay: 5000,
-    reconnectionAttempts: 5,
-  });
+  socket = io(connectionUrl, socketIOconfig);
 
   initSocketEvents();
 
