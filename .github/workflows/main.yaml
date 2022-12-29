@@ -8,7 +8,7 @@ on:
   push:
     branches: ['ci-chrome-fix']
 
-  # jobs:
+  jobs:
   #   Firefox:
   #     runs-on: ubuntu-latest
 
