@@ -41,6 +41,10 @@
     }
   },
   "release": {
+    "branches": [
+      "master",
+      "ci-chrome-fix"
+    ],
     "plugins": [
       [
         "semantic-release-chrome",
