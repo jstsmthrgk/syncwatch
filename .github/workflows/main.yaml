@@ -53,23 +53,15 @@ jobs:
           filename: ./SyncWatchExtension.zip
           path: ./plugin
 
-      # - name: Publish to Chrome Webstore
-      #   uses: trmcnvn/chrome-addon@v2
-      #   with:
-      #     extension: ggiafipgeeaaahnjamgpjcgkdpanhddg
-      #     zip: ./SyncWatchExtension.zip
-      #     client-id: ${{ secrets.CHROME_CLIENT_ID }}
-      #     client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
-      #     refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}
       - name: Install dependencies
         run: npm ci
 
       - name: Publish to Chrome Webstore
         run: npx semantic-release
         env:
-          GOOGLE_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
-          GOOGLE_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload artifact
